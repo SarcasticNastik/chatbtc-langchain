@@ -33,6 +33,8 @@ export const truncate_chat_history = (
   chat_history: [string, string][],
   token_limit: number,
 ) => {
+  if (chat_history.length == 0)
+    return [];
   let result = '';
 
   for (const [question, answer] of chat_history.reverse()) {
