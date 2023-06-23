@@ -1,7 +1,14 @@
 import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import { useEffect, useRef, useState } from 'react';
-import { Box, Container, Flex, Heading, IconButton, Textarea } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  IconButton,
+  Textarea,
+} from '@chakra-ui/react';
 import { BitcoinIcon, SendIcon } from '@/chakra/custom-chakra-icons';
 import { isMobile } from 'react-device-detect';
 import MessageBox, { Message } from '@/components/message/message';
@@ -9,11 +16,11 @@ import { defaultErrorMessage } from '@/config/error-config';
 import { v4 as uuidv4 } from 'uuid';
 import BackgroundHelper from '@/components/background/BackgroundHelper';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 const initialStream: Message = {
-  type: "apiStream",
-  message: "",
-  uniqueId: "",
+  type: 'apiStream',
+  message: '',
+  uniqueId: '',
 };
 const matchFinalWithLinks = /(^\[\d+\]:\shttps:\/\/)/gm;
 interface RatingProps {
@@ -22,7 +29,7 @@ interface RatingProps {
 }
 
 interface FeedbackStatus {
-  [messageId: string]: "submitted" | undefined;
+  [messageId: string]: 'submitted' | undefined;
 }
 
 function formatDate(date: Date) {
@@ -38,30 +45,34 @@ function formatDate(date: Date) {
 }
 
 export default function Home() {
-  const [userInput, setUserInput] = useState("");
+  const [userInput, setUserInput] = useState('');
   const [history, setHistory] = useState<[string, string][]>([]);
   const [loading, setLoading] = useState(false);
   const [streamLoading, setStreamLoading] = useState(false);
   const [streamData, setStreamData] = useState<Message>(initialStream);
-  const [typedMessage, setTypedMessage] = useState("");
+  const [typedMessage, setTypedMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
-      message: "Hi there! How can I help?",
-      type: "apiMessage",
-      uniqueId: "",
+      message: 'Hi there! How can I help?',
+      type: 'apiMessage',
+      uniqueId: '',
     },
   ]);
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const idleBackground = !userInput.trim() && messages.length === 1 && loading === false
+  const idleBackground =
+    !userInput.trim() && messages.length === 1 && loading === false;
 
   // add typing effect
-  const addTypingEffect = async (message: string, callback: (typedText: string) => void) => {
-    setTypedMessage("");
+  const addTypingEffect = async (
+    message: string,
+    callback: (typedText: string) => void,
+  ) => {
+    setTypedMessage('');
 
-    let typedText = "";
+    let typedText = '';
     for (const char of message) {
       typedText += char;
       setTypedMessage(typedText);
@@ -87,7 +98,7 @@ export default function Home() {
   useEffect(() => {
     if (textAreaRef?.current) {
       const _textarea = textAreaRef.current;
-      const _length = userInput?.split("\n")?.length;
+      const _length = userInput?.split('\n')?.length;
       _textarea.rows = _length > 3 ? 3 : (Boolean(_length) && _length) || 1;
     }
   }, [userInput]);
@@ -106,7 +117,7 @@ export default function Home() {
         ...prevMessages,
         {
           message: messageWithTypingEffect,
-          type: "apiMessage",
+          type: 'apiMessage',
           uniqueId: uuid,
         },
       ]);
@@ -114,27 +125,27 @@ export default function Home() {
   };
 
   const addDocumentToMongoDB = async (payload: any) => {
-    const response = await fetch("/api/mongo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/mongo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     const { data } = await response.json();
     return data;
   };
   const getDocumentInMongoDB = async (uniqueId: string) => {
-    const response = await fetch("/api/mongo?unique=" + uniqueId, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/mongo?unique=' + uniqueId, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     });
     const { data } = await response.json();
     return data;
   };
 
   const updateDocumentInMongoDB = async (uniqueId: string, payload: any) => {
-    const response = await fetch("/api/mongo?unique=" + uniqueId, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/mongo?unique=' + uniqueId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     const { data } = await response.json();
@@ -142,39 +153,39 @@ export default function Home() {
   };
 
   const fetchResult = async (query: string) => {
-    setHistory((prevState: [string, string][]) => [...prevState, [query, ""]])
+    setHistory((prevState: [string, string][]) => [...prevState, [query, '']]);
 
-    return await fetch("/api/chat", {
-      method: "POST",
+    return await fetch('/api/chat', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         question: query,
-        history
-      })
+        history,
+      }),
     });
   };
 
   const handleSubmit = async (e: React.FormEvent, prompt?: string) => {
     if (e) {
-      e.preventDefault()
+      e.preventDefault();
     }
     const query = prompt ? prompt.trim() : userInput.trim();
-    if (query === "") {
+    if (query === '') {
       return;
     }
     // Reset the typedMessage state
-    setTypedMessage("");
+    setTypedMessage('');
     let uuid = uuidv4();
     setLoading(true);
     setMessages((prevMessages) => [
       ...prevMessages,
-      { message: query, type: "userMessage", uniqueId: uuid },
+      { message: query, type: 'userMessage', uniqueId: uuid },
     ]);
-    setUserInput("");
+    setUserInput('');
 
-    const errMessage = "Something went wrong. Try again later";
+    const errMessage = 'Something went wrong. Try again later';
 
     try {
       const response: Response = await fetchResult(query);
@@ -184,7 +195,7 @@ export default function Home() {
       const data = response.body;
       const reader = data?.getReader();
       let done = false;
-      let finalAnswerWithLinks = "";
+      let finalAnswerWithLinks = '';
 
       if (!reader) throw new Error(errMessage);
       const decoder = new TextDecoder();
@@ -209,10 +220,11 @@ export default function Home() {
       let question = userInput;
       let answer = finalAnswerWithLinks;
       let uniqueIDD = uuid;
-      let dateString = "15-06-2023"; // DD-MM-YY
-      let timeString = "00:00:00";
+      let dateString = '15-06-2023'; // DD-MM-YY
+      let timeString = '00:00:00';
 
-      const dateTimeString = dateString.split("-").reverse().join("-") + "T" + timeString;
+      const dateTimeString =
+        dateString.split('-').reverse().join('-') + 'T' + timeString;
       const dateObject = new Date(dateTimeString);
       const formattedDateTime = formatDate(dateObject);
 
@@ -224,9 +236,12 @@ export default function Home() {
         rating: null,
         createdAt: new Date().toISOString(),
         updatedAt: null,
-        releasedAt: formattedDateTime
+        releasedAt: formattedDateTime,
       };
-      setHistory((prevState: [string, string][]) => [...prevState, [query, answer]])
+      setHistory((prevState: [string, string][]) => [
+        ...prevState,
+        [query, answer],
+      ]);
       //mongodb database
       // await addDocumentToMongoDB(payload);
 
@@ -238,7 +253,7 @@ export default function Home() {
         ...prevMessages,
         {
           message: err?.message ?? defaultErrorMessage,
-          type: "errorMessage",
+          type: 'errorMessage',
           uniqueId: uuidv4(),
         },
       ]);
@@ -247,12 +262,12 @@ export default function Home() {
   };
 
   const promptChat = async (e: any, prompt: string) => {
-    handleSubmit(e, prompt)
+    handleSubmit(e, prompt);
   };
 
   // Prevent blank submissions and allow for multiline input
   const handleEnter = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       if (isMobile) {
         e.preventDefault();
       } else {
@@ -276,7 +291,7 @@ export default function Home() {
           display="flex"
           flexDir="column"
           alignItems="center"
-          maxW={"1280px"}
+          maxW={'1280px'}
           h="100%"
           p={4}
           centerContent
@@ -287,11 +302,11 @@ export default function Home() {
             mt={{ base: 3, md: 8 }}
             justifyContent="center"
           >
-            <Heading as="h1" size={{ base: "2xl", md: "3xl" }}>
+            <Heading as="h1" size={{ base: '2xl', md: '3xl' }}>
               ChatBTC
             </Heading>
             <BitcoinIcon
-              fontSize={{ base: "4xl", md: "7xl" }}
+              fontSize={{ base: '4xl', md: '7xl' }}
               color="orange.400"
             />
           </Flex>
@@ -315,14 +330,15 @@ export default function Home() {
               overflow="auto"
               maxH="100lvh"
             >
-              {
-                idleBackground ? <BackgroundHelper promptChat={promptChat} /> :
+              {idleBackground ? (
+                <BackgroundHelper promptChat={promptChat} />
+              ) : (
                 <>
                   {messages.length &&
                     messages.map((message, index) => {
-                      const isApiMessage = message.type === "apiMessage";
+                      const isApiMessage = message.type === 'apiMessage';
                       const greetMsg =
-                        message.message === "Hi there! How can I help?";
+                        message.message === 'Hi there! How can I help?';
                       return (
                         <div key={index}>
                           <MessageBox content={message} />
@@ -334,8 +350,10 @@ export default function Home() {
                     <MessageBox
                       // messageId={uuidv4()}
                       content={{
-                        message: streamLoading ? typedMessage : streamData.message,
-                        type: "apiStream",
+                        message: streamLoading
+                          ? typedMessage
+                          : streamData.message,
+                        type: 'apiStream',
                         uniqueId: uuidv4(),
                       }}
                       loading={loading}
@@ -343,7 +361,7 @@ export default function Home() {
                     />
                   )}
                 </>
-              }
+              )}
             </Box>
             {/* <Box w="100%" maxW="100%" flex={{base: "0 0 50px", md:"0 0 100px"}} mb={{base: "70px", md: "70px"}}> */}
             <Box w="100%">

@@ -1,14 +1,14 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
-import { BeatLoader } from "react-spinners";
-import styles from "./message.module.css"
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { BeatLoader } from 'react-spinners';
+import styles from './message.module.css';
 
 export interface Message {
   message: string;
-  type: "userMessage" | "apiMessage" | "errorMessage" | "apiStream";
+  type: 'userMessage' | 'apiMessage' | 'errorMessage' | 'apiStream';
   uniqueId: string;
 }
 
-type MessageType = "userMessage" | "apiMessage" | "errorMessage" | "apiStream";
+type MessageType = 'userMessage' | 'apiMessage' | 'errorMessage' | 'apiStream';
 
 type MessageConfig = {
   [key in MessageType]: {
@@ -22,27 +22,27 @@ type MessageConfig = {
 const messageConfig: MessageConfig = {
   apiMessage: {
     color: null,
-    bg: "gray.600",
-    text: "ChatBTC",
-    headingColor: "orange.400",
+    bg: 'gray.600',
+    text: 'ChatBTC',
+    headingColor: 'orange.400',
   },
   userMessage: {
     color: null,
-    bg: "gray.800",
-    text: "You",
-    headingColor: "purple.400",
+    bg: 'gray.800',
+    text: 'You',
+    headingColor: 'purple.400',
   },
   errorMessage: {
-    color: "red.200",
-    bg: "gray.600",
-    text: "ChatBTC",
-    headingColor: "red.500",
+    color: 'red.200',
+    bg: 'gray.600',
+    text: 'ChatBTC',
+    headingColor: 'red.500',
   },
   apiStream: {
     color: null,
-    bg: "gray.600",
-    text: "ChatBTC",
-    headingColor: "orange.400",
+    bg: 'gray.600',
+    text: 'ChatBTC',
+    headingColor: 'orange.400',
   },
 };
 
@@ -55,7 +55,7 @@ const MessageBox = ({
   loading?: boolean;
   streamLoading?: boolean;
 }) => {
-  const {message, type} = content
+  const { message, type } = content;
 
   // const bodyRegex = /^\[\d+\]:/gm
   // const urlRegex = /^\[\d+\]:(.*)/gm
@@ -66,8 +66,8 @@ const MessageBox = ({
       flexDir="column"
       gap={{ base: 1, md: 2 }}
       w="100%"
-      bgColor={messageConfig[type].bg ?? ""}
-      textAlign={type === "userMessage" ? "right" : "left"}
+      bgColor={messageConfig[type].bg ?? ''}
+      textAlign={type === 'userMessage' ? 'right' : 'left'}
       py={{ base: 3, md: 4 }}
       px={{ base: 3, md: 4 }}
     >
@@ -82,9 +82,9 @@ const MessageBox = ({
       {loading ? (
         <BeatLoader color="white" />
       ) : streamLoading ? (
-        <StreamMessageContent message={message} type={type} uniqueId={""} />
+        <StreamMessageContent message={message} type={type} uniqueId={''} />
       ) : (
-        <MessageContent message={message} type={type} uniqueId={""} />
+        <MessageContent message={message} type={type} uniqueId={''} />
       )}
     </Flex>
   );
@@ -92,22 +92,31 @@ const MessageBox = ({
 
 export default MessageBox;
 
-const MessageContent = ({message, type}: Message) => {
-  const splitRegex = /(^\[\d+\]:\s.*)/gm
-  const chunks = message?.split(splitRegex).filter(value => (value.length>1))
-  const messageBody = chunks[0]
-  const messageLinks = chunks.slice(1)
+const MessageContent = ({ message, type }: Message) => {
+  const splitRegex = /(^\[\d+\]:\s.*)/gm;
+  const chunks = message?.split(splitRegex).filter((value) => value.length > 1);
+  const messageBody = chunks[0];
+  const messageLinks = chunks.slice(1);
 
-  const ClickableLink = ({linkString}: {linkString: string}) => {
-    let url = linkString.split(" ")[1].trim()
-    return <a href={url} target="_blank" rel="noreferrer" className={styles.reference_link}>{linkString}</a>
-  }
+  const ClickableLink = ({ linkString }: { linkString: string }) => {
+    let url = linkString.split(' ')[1].trim();
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className={styles.reference_link}
+      >
+        {linkString}
+      </a>
+    );
+  };
 
-  if (!chunks) return null
+  if (!chunks) return null;
 
   return (
     <>
-      <Text whiteSpace="pre-wrap" color={messageConfig[type].color || ""}>
+      <Text whiteSpace="pre-wrap" color={messageConfig[type].color || ''}>
         {messageBody}
       </Text>
       <Box>
@@ -118,15 +127,15 @@ const MessageContent = ({message, type}: Message) => {
         ))}
       </Box>
     </>
-  )
-}
+  );
+};
 
-const StreamMessageContent = ({message, type}: Message) => {
+const StreamMessageContent = ({ message, type }: Message) => {
   return (
     <>
-      <Text whiteSpace="pre-wrap" color={messageConfig[type].color || ""}>
+      <Text whiteSpace="pre-wrap" color={messageConfig[type].color || ''}>
         {message}
       </Text>
     </>
-  )
-}
+  );
+};
